@@ -1,13 +1,28 @@
 xquery version "3.0";
 
-module namespace api = "http://acdh.oeaw.ac.at/apps/xtoks/api";
 
+module namespace api = "http://acdh.oeaw.ac.at/apps/xtoks/api";
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 
 import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
 import module namespace tok = "http://acdh.oeaw.ac.at/apps/xtoks/tokenize" at "tok.xqm";
 import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtoks/profile" at "profile.xqm";
+
+
+(: Remove Newlines :)
+declare
+    %rest:POST("{$data}")
+    %rest:path("/xtoks/rmNl")
+    %rest:consumes("application/xml")
+    %rest:produces("application/xml")
+function api:rmNl($data as document-node()) {
+    tok:rmNl($data, ())
+};
+
+
+
+
 
 (: Tokenizer Endpoints :)
 declare
@@ -16,7 +31,10 @@ declare
     %rest:query-param("format", "{$format}", "doc")
     %rest:consumes("application/xml")
     %rest:produces("application/xml")
-function api:tokenize($data as document-node(), $profile-id as xs:string, $format as xs:string*) {
+    %output:method("xml")
+    %output:encoding("UTF-8")
+    %output:indent("yes")
+function api:tokenize-xml($data as document-node(), $profile-id as xs:string, $format as xs:string*) {
     tok:tokenize($data, $profile-id, $format[1])
 };
 
@@ -27,7 +45,8 @@ declare
     %rest:consumes("application/xml")
     %rest:produces("text/plain")
     %output:method("text")
-function api:tokenize($data as document-node(), $profile-id as xs:string) {
+    %output:encoding("UTF-8")
+function api:tokenize-txt($data as document-node(), $profile-id as xs:string) {
     tok:tokenize($data, $profile-id, "txt")
 };
 
