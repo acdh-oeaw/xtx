@@ -4,7 +4,7 @@ module namespace tok = "http://acdh.oeaw.ac.at/apps/xtoks/tokenize";
 import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
 import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtoks/profile" at "profile.xqm";
 
-declare function tok:rmNl ($doc as document-node(), $profile-id as xs:string) as document-node() {
+declare function tok:rmNl ($doc as document-node(), $profile-id as xs:string?) as document-node() {
     let $path-to-xsl := $config:tokenizer-home||"/xsl/rmNl.xsl",
         $xsl := doc($path-to-xsl)
     return document { transform:transform($doc, $xsl, ()) }
@@ -39,7 +39,7 @@ declare function tok:tei2vert($doc as document-node(), $profile-id as xs:string)
         then document { transform:transform($doc, $xsl, ()) }
         else ()
 };
-
+  
 declare function tok:vert2txt($doc as document-node(), $profile-id as xs:string) as item() {
     let $profile := profile:home($profile-id),
         $path-to-wrapper := $profile||"/wrapper_vert2txt.xsl",
