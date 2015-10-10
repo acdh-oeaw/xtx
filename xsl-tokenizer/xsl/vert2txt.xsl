@@ -6,21 +6,20 @@
         <xsl:param name="elt"/>
         <xsl:text>&lt;</xsl:text>
         <xsl:value-of select="local-name($elt)"/>
-        <xsl:text>&gt;
-</xsl:text>
+        <xsl:text>&gt;&#10;</xsl:text>
         <xsl:apply-templates select="$elt/*"/>
         <xsl:text>&lt;/</xsl:text>
         <xsl:value-of select="local-name($elt)"/>
-        <xsl:text>&gt;
-</xsl:text>
+        <xsl:text>&gt;&#10;</xsl:text>
     </xsl:function>
     <xsl:template match="/">
         <xsl:apply-templates select="tei:TEI/tei:text/tei:body"/>
     </xsl:template>
+    <xsl:template match="tei:seg[@type = 'ws']"/>
     <xsl:template match="*">
         <xsl:apply-templates/>
     </xsl:template>
     <xsl:template match="tei:w|tei:pc">
-        <xsl:value-of select="concat(.,'&#xA;')"/>
+        <xsl:value-of select="concat(normalize-space(.),'&#9;',@xml:id,'&#xA;')"/>
     </xsl:template>
 </xsl:stylesheet>
