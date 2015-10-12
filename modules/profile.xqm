@@ -15,14 +15,16 @@ declare function profile:home($id as xs:string) {
         else ()
 };
 
-declare function profile:create($profile as document-node()) {
-    let $id := $profile/profile/@id
+declare function profile:create($profile as document-node()) as xs:string {
+    let $id := util:uuid()
     return
         if ($id)
-        then (
-            xmldb:create-collection($config:profiles, $id), 
-            xmldb:store($config:profiles||"/"||$id, "profile.xml", $profile)
-        )
+        then 
+            let $col := xmldb:create-collection($config:profiles, $id), 
+                $store := xmldb:store($config:profiles||"/"||$id, "profile.xml", $profile),
+                $set-id := update value doc($config:profiles||"/"||$id||"/profile.xml")/profile/@id with $id,
+                $set-created := update value doc($config:profiles||"/"||$id||"/profile.xml")/profile/@created with current-dateTime()
+            return $id
         else () 
 };
 
