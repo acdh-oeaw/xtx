@@ -44,34 +44,35 @@
     </xsl:function>
     <xsl:variable name="profile-name" as="xs:string" select="/profile/@id"/>
     <xsl:template match="/"><!-- parameter stylesheet -->
-        <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
+        
+            <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
             <xsl:attribute name="xml:id">params</xsl:attribute>
-            <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
-            <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
-            <xsl:attribute name="version">2.0</xsl:attribute>
-            <xsl:for-each select="//namespace">
-                <namespace name="{@prefix}" select="."/>
-            </xsl:for-each>
-            <for-each select="//param">
-                <xsl:element name="xsl:param">
-                    <xsl:attribute name="name">
-                        <xsl:value-of select="@key"/>
-                    </xsl:attribute>
-                    <if test="@as">
-                        <xsl:attribute name="as">
-                            <xsl:value-of select="@as"/>
+                <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
+                <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
+                <xsl:attribute name="version">2.0</xsl:attribute>
+                <xsl:for-each select="//namespace">
+                    <namespace name="{@prefix}" select="."/>
+                </xsl:for-each>
+                <for-each select="//param">
+                    <xsl:element name="xsl:param">
+                        <xsl:attribute name="name">
+                            <xsl:value-of select="@key"/>
                         </xsl:attribute>
-                    </if>
-                    <value-of select="xtoks:expand-path(@value)"/>
-                </xsl:element>
-            </for-each>
-            <if test="//param[@key = 'lexicon']">
+                        <if test="@as">
+                            <xsl:attribute name="as">
+                                <xsl:value-of select="@as"/>
+                            </xsl:attribute>
+                        </if>
+                        <value-of select="xtoks:expand-path(@value)"/>
+                    </xsl:element>
+                </for-each>
                 <variable name="lexicon" select="//param[@key = 'lexicon']"/>
                 <xsl:element name="xsl:param">
                     <xsl:attribute name="name">lexToks</xsl:attribute>
                     <xsl:element name="lexicon" namespace="">
                         <xsl:for-each select="tokenize($lexicon,'\n+')">
-                            <seg xmlns="http://www.tei-c.org/ns/1.0">
+                            <xsl:sort select="string-length(.)" order="descending"/>
+                            <entry xmlns="http://www.tei-c.org/ns/1.0">
                                 <xsl:attribute name="xml:id" select="concat('entry_',position())"/>
                                 <xsl:for-each select="normalize-space(.)">
                                     <xsl:call-template name="tokenize-text">
@@ -80,174 +81,184 @@
                                         <xsl:with-param name="preserve-ws" select="$preserve-ws"/>
                                     </xsl:call-template>
                                 </xsl:for-each>
-                            </seg>
+                            </entry>
                         </xsl:for-each>
                     </xsl:element>
                 </xsl:element>
-            </if>
-            <xsl:for-each select="//expression[parent::ignore]">
-                <xsl:element name="xsl:template">
-                    <xsl:attribute name="match" select="."/>
-                    <xsl:attribute name="mode">is-ignore-node</xsl:attribute>
-                    <xsl:element name="xsl:sequence">
-                        <xsl:attribute name="select">true()</xsl:attribute>
-                    </xsl:element>
-                </xsl:element>
-            </xsl:for-each>
-            <xsl:for-each select="//expression[parent::in-word-tags]">
-                <xsl:element name="xsl:template">
-                    <xsl:attribute name="match" select="."/>
-                    <xsl:attribute name="mode">is-inline-node</xsl:attribute>
-                    <xsl:element name="xsl:sequence">
-                        <xsl:attribute name="select">true()</xsl:attribute>
-                    </xsl:element>
-                </xsl:element>
-            </xsl:for-each>
-            <xsl:for-each select="//expression[parent::floating-blocks]">
-                <xsl:element name="xsl:template">
-                    <xsl:attribute name="match" select="."/>
-                    <xsl:attribute name="mode">is-floating-node</xsl:attribute>
-                    <xsl:element name="xsl:sequence">
-                        <xsl:attribute name="select">true()</xsl:attribute>
-                    </xsl:element>
-                </xsl:element>
-            </xsl:for-each>
-            <xsl:for-each select="//expression[parent::copy]">
-                <xsl:element name="xsl:template">
-                    <xsl:attribute name="match" select="."/>
-                    <xsl:attribute name="mode">is-copy-node</xsl:attribute>
-                    <xsl:element name="xsl:sequence">
-                        <xsl:attribute name="select">true()</xsl:attribute>
-                    </xsl:element>
-                </xsl:element>
-            </xsl:for-each>
-        </xsl:element>
-        <xsl:if test="exists(//postProcessing[xsl:stylesheet])">
-            <xsl:copy-of select="//postProcessing/xsl:stylesheet"/>
-        </xsl:if><!-- tokenizer wrapper -->
-        <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
-            <xsl:attribute name="xml:id">wrapper_toks</xsl:attribute>
-            <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
-            <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
-            <xsl:for-each select="//namespace">
-                <xsl:namespace name="{@prefix}" select="."/>
-            </xsl:for-each>
-            <xsl:attribute name="version">2.0</xsl:attribute>
-            <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href">params.xsl</xsl:attribute>
-            </xsl:element>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href" select="$pathToTokenizerLib"/>
-            </xsl:element>
-            <xsl:if test="exists(//postProcessing[xsl:stylesheet])">
-                <xsl:element name="xsl:include">
-                    <xsl:attribute name="href">postTokenization.xsl</xsl:attribute>
-                </xsl:element>
-            </xsl:if>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-        </xsl:element><!-- tokenizer wrapper -->
-        <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
-            <xsl:attribute name="xml:id">wrapper_addP</xsl:attribute>
-            <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
-            <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
-            <xsl:for-each select="//namespace">
-                <xsl:namespace name="{@prefix}" select="."/>
-            </xsl:for-each>
-            <xsl:for-each select="//namespace">
-                <xsl:namespace name="{@prefix}" select="."/>
-            </xsl:for-each>
-            <xsl:attribute name="version">2.0</xsl:attribute>
-            <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href">params.xsl</xsl:attribute>
-            </xsl:element>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href" select="$pathToPLib"/>
-            </xsl:element>
-            <xsl:if test="exists(//postProcessing[xsl:stylesheet])">
-                <xsl:element name="xsl:include">
-                    <xsl:attribute name="href">postTokenization.xsl</xsl:attribute>
-                </xsl:element>
-            </xsl:if>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-        </xsl:element>
-        <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
-            <xsl:attribute name="xml:id">wrapper_tei2vert</xsl:attribute>
-            <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
-            <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
-            <xsl:for-each select="//namespace">
-                <xsl:namespace name="{@prefix}" select="."/>
-            </xsl:for-each>
-            <xsl:attribute name="version">2.0</xsl:attribute>
-            <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href">params.xsl</xsl:attribute>
-            </xsl:element>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href" select="$pathToVertXSL"/>
-            </xsl:element>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-            <xsl:for-each select="//expression[parent::structure]">
-                <xsl:element name="xsl:template">
-                    <xsl:attribute name="match" select="."/>
-                    <xsl:attribute name="mode">extractTokens</xsl:attribute>
-                    <xsl:element name="xsl:copy">
-                        <xsl:element name="xsl:apply-templates">
-                            <xsl:attribute name="mode">#current</xsl:attribute>
+                <xsl:for-each select="//expression[parent::ignore][text()]">
+                    <xsl:element name="xsl:template">
+                        <xsl:attribute name="match" select="."/>
+                        <xsl:attribute name="mode">is-ignore-node</xsl:attribute>
+                        <xsl:element name="xsl:sequence">
+                            <xsl:attribute name="select">true()</xsl:attribute>
                         </xsl:element>
                     </xsl:element>
-                </xsl:element>
-            </xsl:for-each>
-        </xsl:element>
-        <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
-            <xsl:attribute name="xml:id">wrapper_vert2txt</xsl:attribute>
-            <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
-            <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
-            <xsl:namespace name="xtoks">http://acdh.oeaw.ac.at/xtoks</xsl:namespace>
-            <xsl:for-each select="//namespace">
-                <xsl:namespace name="{@prefix}" select="."/>
-            </xsl:for-each>
-            <xsl:attribute name="version">2.0</xsl:attribute>
-            <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
-            <xsl:element name="xsl:output">
-                <xsl:attribute name="method">text</xsl:attribute>
-            </xsl:element>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href">params.xsl</xsl:attribute>
-            </xsl:element>
-            <xsl:element name="xsl:include">
-                <xsl:attribute name="href" select="$pathToVertTxtXSL"/>
-            </xsl:element>
-            <xsl:text xml:space="preserve">
-
-</xsl:text>
-            <xsl:for-each select="//expression[parent::structure]">
-                <xsl:element name="xsl:template">
-                    <xsl:attribute name="match" select="."/>
-                    <xsl:element name="xsl:sequence">
-                        <xsl:attribute name="select">xtoks:structure(.)</xsl:attribute>
+                </xsl:for-each>
+                <xsl:for-each select="//expression[parent::in-word-tags][text()]">
+                    <xsl:element name="xsl:template">
+                        <xsl:attribute name="match" select="."/>
+                        <xsl:attribute name="mode">is-inline-node</xsl:attribute>
+                        <xsl:element name="xsl:sequence">
+                            <xsl:attribute name="select">true()</xsl:attribute>
+                        </xsl:element>
                     </xsl:element>
+                </xsl:for-each>
+                <xsl:for-each select="//expression[parent::floating-blocks][text()]">
+                    <xsl:element name="xsl:template">
+                        <xsl:attribute name="match" select="."/>
+                        <xsl:attribute name="mode">is-floating-node</xsl:attribute>
+                        <xsl:element name="xsl:sequence">
+                            <xsl:attribute name="select">true()</xsl:attribute>
+                        </xsl:element>
+                    </xsl:element>
+                </xsl:for-each>
+                <xsl:for-each select="//expression[parent::copy][text()]">
+                    <xsl:element name="xsl:template">
+                        <xsl:attribute name="match" select="."/>
+                        <xsl:attribute name="mode">is-copy-node</xsl:attribute>
+                        <xsl:element name="xsl:sequence">
+                            <xsl:attribute name="select">true()</xsl:attribute>
+                        </xsl:element>
+                    </xsl:element>
+                </xsl:for-each>
+            </xsl:element>
+        
+        <xsl:if test="exists(//postProcessing[xsl:stylesheet])">
+            
+                <xsl:copy-of select="//postProcessing/xsl:stylesheet"/>
+            
+        </xsl:if><!-- tokenizer wrapper -->
+        
+            <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
+            <xsl:attribute name="xml:id">wrapper_toks</xsl:attribute>
+                <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
+                <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
+                <xsl:for-each select="//namespace">
+                    <xsl:namespace name="{@prefix}" select="."/>
+                </xsl:for-each>
+                <xsl:attribute name="version">2.0</xsl:attribute>
+                <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href">params.xsl</xsl:attribute>
                 </xsl:element>
-            </xsl:for-each>
-        </xsl:element>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href" select="$pathToTokenizerLib"/>
+                </xsl:element>
+                <xsl:if test="exists(//postProcessing[xsl:stylesheet])">
+                    <xsl:element name="xsl:include">
+                        <xsl:attribute name="href">postTokenization.xsl</xsl:attribute>
+                    </xsl:element>
+                </xsl:if>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+            </xsl:element>
+        <!-- tokenizer wrapper -->
+        
+            <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
+            <xsl:attribute name="xml:id">wrapper_addP</xsl:attribute>
+                <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
+                <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
+                <xsl:for-each select="//namespace">
+                    <xsl:namespace name="{@prefix}" select="."/>
+                </xsl:for-each>
+                <xsl:for-each select="//namespace">
+                    <xsl:namespace name="{@prefix}" select="."/>
+                </xsl:for-each>
+                <xsl:attribute name="version">2.0</xsl:attribute>
+                <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href">params.xsl</xsl:attribute>
+                </xsl:element>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href" select="$pathToPLib"/>
+                </xsl:element>
+                <xsl:if test="exists(//postProcessing[xsl:stylesheet])">
+                    <xsl:element name="xsl:include">
+                        <xsl:attribute name="href">postTokenization.xsl</xsl:attribute>
+                    </xsl:element>
+                </xsl:if>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+            </xsl:element>
+        
+        
+            <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
+            <xsl:attribute name="xml:id">wrapper_tei2vert</xsl:attribute>
+                <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
+                <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
+                <xsl:for-each select="//namespace">
+                    <xsl:namespace name="{@prefix}" select="."/>
+                </xsl:for-each>
+                <xsl:attribute name="version">2.0</xsl:attribute>
+                <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href">params.xsl</xsl:attribute>
+                </xsl:element>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href" select="$pathToVertXSL"/>
+                </xsl:element>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+                <xsl:for-each select="//expression[parent::structure][text()]">
+                    <xsl:element name="xsl:template">
+                        <xsl:attribute name="match" select="."/>
+                        <xsl:attribute name="mode">extractTokens</xsl:attribute>
+                        <xsl:element name="xsl:copy">
+                            <xsl:element name="xsl:apply-templates">
+                                <xsl:attribute name="mode">#current</xsl:attribute>
+                            </xsl:element>
+                        </xsl:element>
+                    </xsl:element>
+                </xsl:for-each>
+            </xsl:element>
+        
+        
+            <xsl:element name="xsl:stylesheet" namespace="http://www.w3.org/1999/XSL/Transform">
+            <xsl:attribute name="xml:id">wrapper_vert2txt</xsl:attribute>
+                <xsl:namespace name="xs">http://www.w3.org/2001/XMLSchema</xsl:namespace>
+                <xsl:namespace name="xd">http://www.oxygenxml.com/ns/doc/xsl</xsl:namespace>
+                <xsl:namespace name="xtoks">http://acdh.oeaw.ac.at/xtoks</xsl:namespace>
+                <xsl:for-each select="//namespace">
+                    <xsl:namespace name="{@prefix}" select="."/>
+                </xsl:for-each>
+                <xsl:attribute name="version">2.0</xsl:attribute>
+                <xsl:attribute name="exclude-result-prefixes">#all</xsl:attribute>
+                <xsl:element name="xsl:output">
+                    <xsl:attribute name="method">text</xsl:attribute>
+                </xsl:element>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href">params.xsl</xsl:attribute>
+                </xsl:element>
+                <xsl:element name="xsl:include">
+                    <xsl:attribute name="href" select="$pathToVertTxtXSL"/>
+                </xsl:element>
+                <xsl:text xml:space="preserve">
+
+</xsl:text>
+                <xsl:for-each select="//expression[parent::structure][text()]">
+                    <xsl:element name="xsl:template">
+                        <xsl:attribute name="match" select="."/>
+                        <xsl:element name="xsl:sequence">
+                            <xsl:attribute name="select">xtoks:structure(.)</xsl:attribute>
+                        </xsl:element>
+                    </xsl:element>
+                </xsl:for-each>
+            </xsl:element>
+        
     </xsl:template>
 </xsl:stylesheet>
