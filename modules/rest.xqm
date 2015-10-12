@@ -33,7 +33,9 @@ declare
     %output:method("xml")
     %output:indent("yes")
 function api:tokenize-xml($data as document-node(), $profile-id as xs:string, $format as xs:string*) {
-    tok:tokenize($data, $profile-id, $format[1])
+    if (profile:home($profile-id) != "")
+    then tok:tokenize($data, $profile-id, $format[1])
+    else <error>unknown profile {$profile-id}</error>
 };
 
 
@@ -44,7 +46,9 @@ declare
     %rest:produces("text/plain")
     %output:method("text")
 function api:tokenize-txt($data as document-node(), $profile-id as xs:string) {
-    tok:tokenize($data, $profile-id, "txt")
+    if (profile:home($profile-id) != "")
+    then tok:tokenize($data, $profile-id, "txt")
+    else <error>unknown profile {$profile-id}</error>
 };
 
 
@@ -56,8 +60,11 @@ declare
     %rest:produces("text/plain")
     %output:method("text")
 function api:verticalize($data as document-node(), $profile-id as xs:string) {
-    let $vert := tok:tei2vert($pAdded, $profile-id)
-    return tok:vert2txt($vert, $profile-id)
+    if (profile:home($profile-id) != "")
+    then 
+        let $vert := tok:tei2vert($data, $profile-id)
+        return tok:vert2txt($vert, $profile-id)
+    else <error>unknown profile {$profile-id}</error> 
 };
 
 
@@ -99,8 +106,11 @@ declare
     %rest:produces("application/xml")
     %rest:consumes("application/xml")
 function api:update-profile($data as document-node(), $profile-id as xs:string) {
-    let $update := profile:update($profile-id, $data)
-    return profile:read($profile-id)
+    if (profile:home($profile-id) != "")
+    then 
+        let $update := profile:update($profile-id, $data)
+        return profile:read($profile-id)
+    else <error>unknown profile {$profile-id}</error> 
 };
 
 declare 
@@ -108,5 +118,8 @@ declare
     %rest:path("/xtoks/profile/{$profile-id}")
     %rest:produces("application/xml")
 function api:delete-profile($profile-id as xs:string) {
-    profile:delete($profile-id)
+    if (profile:home($profile-id) != "")
+    then 
+        profile:delete($profile-id)
+    else <error>unknown profile {$profile-id}</error>
 };
