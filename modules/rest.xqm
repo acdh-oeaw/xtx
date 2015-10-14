@@ -34,7 +34,7 @@ declare
     %output:indent("yes")
 function api:tokenize-xml($data as document-node(), $profile-id as xs:string, $format as xs:string*) {
     if (profile:home($profile-id) != "")
-    then tok:tokenize($data, $profile-id, $format[1])
+    then tok:tokenize($data, $profile-id, $format[.!=''][1])
     else <error>unknown profile {$profile-id}</error>
 };
 
