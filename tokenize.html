@@ -1,0 +1,82 @@
+<div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
+    <h4>Tokenizer Webform</h4>
+    <form id="form" class="form-horizontal" method="POST" enctype="application/xml">
+        <div class="control-group">
+            <label for="profile">Profile</label>
+            <select name="profile" id="profile">
+                <option data-template="app:profiles">List of profiles inserted here by templating function app:profile.</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="operation">Operation</label>
+            <select name="operation" id="operation">
+                <option value="rmNl">remove New lines</option>
+                <option value="tokenize">tokenize, return original</option>
+                <option value="verticalizeTXT">tokenize, return plain text vertical</option>
+                <option value="verticalizeXML">tokenize, return xml vertical</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="data">XML file</label>
+            <textarea id="data"><xml/></textarea>
+        </div>
+        <button type="submit">Run</button>
+    </form>
+    <script type="text/javascript"><![CDATA[
+        tokenize = {};
+        tokenize.data = "";
+        tokenize.url = {};
+        tokenize.url.rmNl = "/exist/restxq/xtoks/rmBl";
+        tokenize.url.tokenize = "/exist/restxq/xtoks/tokenize";
+        tokenize.url.verticalizeTXT = "/exist/restxq/xtoks/verticalize";
+        tokenize.url.verticalizeXML = tokenize.url.verticalizeTXT;
+        
+        
+        $(document).ready(function(){
+            $('#form button').click(function(e){
+                e.preventDefault();
+                var  operation = $("select[name = operation]").val(),
+                    profile = $("select[name = profile]").val(),
+                    url = tokenize.url[operation] + "/" + profile,
+                    accept = operation == "verticalizeTXT" ? "text/plain" : "application/xml",
+                    data = $('#data').val(),
+                    dataType = operation == "verticalizeTXT" ? "txt" : "xml",
+                    ext = "." + dataType,
+                    filename = "download" + ext;
+                    $('#form').attr("accept", accept);
+                    $('#form').attr("action", url);
+                
+                $.ajax({
+                    "method" : "POST",
+                    "type" : "POST",
+                    "url" : url,
+                    "data"  : data,
+                    dataType: dataType, 
+                    "async" : true,
+                    headers : {
+                        "Accept" : accept
+                    },
+                    cache: false,
+                    contentType: "application/xml",
+                    processData: false,
+                    beforeSend : function(){
+                        $('*').css("cursor", "wait");
+                        $('#form a').remove();
+                    },
+                    success: function(res) {
+                        var oSerializer = new XMLSerializer();
+                        var doc = oSerializer.serializeToString(res);
+                        $('#form').append('<a download="' + filename + '" href="data:application/octet-stream;charset=utf-8,' + encodeURIComponent(doc) + '">Download Result</a>');
+                        $('*').css("cursor", "initial");
+                    },
+                    error: function(res) {
+                        $('*').css("cursor", "initial");
+                        $('#form a').remove();
+                        alert(res);
+                    },
+                });
+                
+            });
+        });
+    ]]></script>
+</div>
