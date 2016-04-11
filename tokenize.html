@@ -1,57 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
     <h4>Tokenizer Webform</h4>
     <form id="form" class="form-horizontal" method="POST" enctype="application/xml">
-        <div class="control-group">
-            <label for="profile">Profile</label>
-            <select name="profile" id="profile">
-                <option data-template="app:profiles">List of profiles inserted here by templating function app:profile.</option>
-            </select>
+        <div class="control-group"><label for="profile">Profile</label><select name="profile" id="profile">
+                <option data-template="app:profiles">List of profiles inserted here by templating function app:profile.</option></select>
         </div>
-        <div class="control-group">
-            <label for="operation">Operation</label>
-            <select name="operation" id="operation">
+        <div class="control-group"><label for="format">Format</label><select name="format" id="format">
                 <option value="rmNl">remove New lines</option>
-                <option value="tokenize">tokenize, return original</option>
-                <option value="verticalizeTXT">tokenize, return plain text vertical</option>
-                <option value="verticalizeXML">tokenize, return xml vertical</option>
-            </select>
+                <option value="doc">tokenize, return original</option>
+                <option value="txt">tokenize, return plain text vertical</option>
+                <option value="vert">tokenize, return xml vertical</option></select>
         </div>
-        <div class="control-group">
-            <label for="data">XML file</label>
-            <textarea id="data"><xml/></textarea>
-        </div>
-        <button type="submit">Run</button>
+        <div class="control-group"><label for="data">XML file upload</label>
+<!--            <input type="file" name="data" id="data"/>--><textarea id="data">
+                <xml></xml></textarea>
+        </div><button type="submit">Run</button>
     </form>
-    <script type="text/javascript"><![CDATA[
+    <script type="text/javascript">
         tokenize = {};
         tokenize.data = "";
-        tokenize.url = {};
-        tokenize.url.rmNl = "/exist/restxq/xtoks/rmBl";
-        tokenize.url.tokenize = "/exist/restxq/xtoks/tokenize";
-        tokenize.url.verticalizeTXT = "/exist/restxq/xtoks/verticalize";
-        tokenize.url.verticalizeXML = tokenize.url.verticalizeTXT;
+        tokenize.url = "/exist/restxq/xtoks/tokenize";
         
-        
+
         $(document).ready(function(){
             $('#form button').click(function(e){
                 e.preventDefault();
-                var  operation = $("select[name = operation]").val(),
+                var format = $("select[name = format]").val(),
                     profile = $("select[name = profile]").val(),
-                    url = tokenize.url[operation] + "/" + profile,
-                    accept = operation == "verticalizeTXT" ? "text/plain" : "application/xml",
+                    url = tokenize.url + "/" + profile + "?format=" + format,
+                    accept = format == "txt" ? "text/plain" : "application/xml",
                     data = $('#data').val(),
-                    dataType = operation == "verticalizeTXT" ? "txt" : "xml",
+                    dataType = format == "txt" ? "text" : "xml",
                     ext = "." + dataType,
                     filename = "download" + ext;
-                    $('#form').attr("accept", accept);
-                    $('#form').attr("action", url);
-                
+                $('#form').attr("accept", accept);
+                $('#form').attr("action", url);
+
                 $.ajax({
                     "method" : "POST",
                     "type" : "POST",
                     "url" : url,
                     "data"  : data,
-                    dataType: dataType, 
+                    "dataType" : dataType, 
                     "async" : true,
                     headers : {
                         "Accept" : accept
@@ -63,20 +53,24 @@
                         $('*').css("cursor", "wait");
                         $('#form a').remove();
                     },
-                    success: function(res) {
-                        var oSerializer = new XMLSerializer();
-                        var doc = oSerializer.serializeToString(res);
-                        $('#form').append('<a download="' + filename + '" href="data:application/octet-stream;charset=utf-8,' + encodeURIComponent(doc) + '">Download Result</a>');
+                    success: function(res, status, jqXHR) {
+                        if (format == "txt") {
+                            $('#form').append('<a download="' + filename + '" href="data:text/plain;charset=utf-8,' + encodeURIComponent(res) + '">Download Result</a>');
+                        } else {
+                            var oSerializer = new XMLSerializer();
+                            var doc = oSerializer.serializeToString(res);
+                            $('#form').append('<a download="' + filename + '" href="data:application/octet-stream;charset=utf-8,' + encodeURIComponent(doc) + '">Download Result</a>');
+                        }
                         $('*').css("cursor", "initial");
                     },
-                    error: function(res) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         $('*').css("cursor", "initial");
                         $('#form a').remove();
-                        alert(res);
-                    },
+                        alert(errorThrown + " " + jqXHR.statusText + " " + jqXHR.responseText);
+                    }
                 });
-                
+
             });
         });
-    ]]></script>
+    </script>
 </div>
