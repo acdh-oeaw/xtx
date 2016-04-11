@@ -23,7 +23,7 @@ function api:rmNl($data as document-node()) {
 
 
 
-(: Tokenizer Endpoints :)
+(: either return the tokenized document (format = doc) or a xml vertical (format = vert):)
 declare
     %rest:POST("{$data}")
     %rest:path("/xtoks/tokenize/{$profile-id}")
@@ -38,7 +38,7 @@ function api:tokenize-xml($data as document-node(), $profile-id as xs:string, $f
     else <error>unknown profile {$profile-id}</error>
 };
 
-
+(: make a plain text vertical of document :)
 declare
     %rest:POST("{$data}")
     %rest:path("/xtoks/tokenize/{$profile-id}")
@@ -50,7 +50,7 @@ function api:tokenize-txt($data as document-node(), $profile-id as xs:string) {
     then tok:tokenize($data, $profile-id, "txt")
     else <error>unknown profile {$profile-id}</error>
 };
-
+ 
 
 (: Make vertical of document with tokens :)
 declare
