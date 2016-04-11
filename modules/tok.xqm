@@ -61,5 +61,6 @@ declare function tok:tokenize($doc as document-node(), $profile-id as xs:string,
             case "txt" return 
                 let $vert := tok:tei2vert($pAdded, $profile-id)
                 return tok:vert2txt($vert, $profile-id)
+            case "doc" return $pAdded
             default return $pAdded
 };
