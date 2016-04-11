@@ -8,11 +8,11 @@ declare namespace xsl="http://www.w3.org/1999/XSL/Transform";
 import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
 
 declare function profile:home($id as xs:string) {
-    let $path := $config:profiles||"/"||$id
-    return 
-        if (doc-available($path||"/profile.xml"))
-        then $path
-        else ()
+    let $profile := profile:read($id)
+    return
+    if (exists($profile))
+    then util:collection-name($profile)
+    else error(xs:QName('profile:unknownProfile'), 'Unknown profile', $id)
 };
 
 declare function profile:create($profile as document-node()) as xs:string {
@@ -28,7 +28,7 @@ declare function profile:create($profile as document-node()) as xs:string {
         else () 
 };
 
-declare function profile:read($id as xs:string) {
+declare function profile:read($id as xs:string) as element(profile) {
     collection($config:profiles)//profile[@id = $id]
 };
 
@@ -44,7 +44,14 @@ declare function profile:delete($id as xs:string) {
 
 declare function profile:prepare($id as xs:string) {
     (:get the profile:)
-    let $profile := profile:read($id)
+    let $profile := profile:read($id),
+        $profile-home := profile:home($id)
+    return 
+        if (not(exists($profile)))
+        then error(xs:QName('profile:unknownProfile'), 'Unknown profile', $id)
+        else if ($profile-home = "")
+        then error(xs:QName('profile:homeNotFound'), 'Profile home not found', $id)
+        else
     
     (: since the original "make_xsl.xsl" makes use of xsl:result-document 
        (which does not work in exist-db) we have to make some exist-db-specific 
@@ -60,4 +67,11 @@ declare function profile:prepare($id as xs:string) {
     return 
         for $s in $stylesheets
         return xmldb:store(profile:home($id), $s/@xml:id||".xsl", $s)
+};
+
+(: getter function for specific profile settings :)
+declare function profile:value($profile as element(profile), $value-name as xs:string){
+    switch($value-name)
+        case "name" return $profile/about/name/text()
+        default return ()
 };
