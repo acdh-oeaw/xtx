@@ -16,6 +16,7 @@ declare
     %rest:path("/xtoks/rmNl")
     %rest:consumes("application/xml")
     %rest:produces("application/xml")
+    %tok:desc("Preparatory Step: Removes all insignificant newlines from the input document")
 function api:rmNl($data as document-node()) {
     tok:rmNl($data, ())
 };
@@ -32,6 +33,7 @@ declare
     %rest:produces("application/xml")
     %output:method("xml")
     %output:indent("yes")
+    %tok:desc("Tokenize the document according to the selected profile and return either the original file with inlined tokens (?format=doc, default) or a vertical TEI/XML document with a flat token sequence (?format=vert). ")
 function api:tokenize-xml($data as document-node(), $profile-id as xs:string, $format as xs:string*) {
     if (profile:home($profile-id) != "")
     then tok:tokenize($data, $profile-id, $format[.!=''][1])
@@ -45,6 +47,7 @@ declare
     %rest:consumes("application/xml")
     %rest:produces("text/plain")
     %output:method("text")
+    %tok:desc("Tokenize the document according to the selected profile and return a verticalized plain text file. ")
 function api:tokenize-txt($data as document-node(), $profile-id as xs:string) {
     if (profile:home($profile-id) != "")
     then tok:tokenize($data, $profile-id, "txt")
@@ -59,6 +62,7 @@ declare
     %rest:consumes("application/xml")
     %rest:produces("text/plain")
     %output:method("text")
+    %tok:desc("Create a plain text vertical out of an XML document with inlined tokens.")
 function api:verticalize($data as document-node(), $profile-id as xs:string) {
     if (profile:home($profile-id) != "")
     then 
@@ -75,6 +79,7 @@ declare
     %rest:produces("application/xml")
     %output:method("xml")
     %output:indent("yes")
+    %tok:desc("List available tokenization profiles.")
 function api:list-profiles() {
     <profiles>{
             for $p in collection($config:profiles)//profile 
@@ -86,6 +91,7 @@ declare
     %rest:GET 
     %rest:path("/xtoks/profile/{$profile-id}")
     %rest:produces("application/xml")
+    %tok:desc("Get tokenization profile with ID {$profile-id}.")
 function api:read-profile($profile-id as xs:string){
     profile:read($profile-id)
 };
@@ -95,6 +101,7 @@ declare
     %rest:path("/xtoks/profile")
     %rest:produces("application/xml")
     %rest:consumes("application/xml")
+    %tok:desc("Create a new tokenization profile.")
 function api:create-profile($data as document-node()) {
     let $id := profile:create($data)
     return profile:read($id)
@@ -105,6 +112,7 @@ declare
     %rest:path("/xtoks/profile/{$profile-id}")
     %rest:produces("application/xml")
     %rest:consumes("application/xml")
+    %tok:desc("Update tokenization profile with ID {$profile-id}.")
 function api:update-profile($data as document-node(), $profile-id as xs:string) {
     if (profile:home($profile-id) != "")
     then 
@@ -117,6 +125,7 @@ declare
     %rest:DELETE 
     %rest:path("/xtoks/profile/{$profile-id}")
     %rest:produces("application/xml")
+    %tok:desc("Delete tokenization profile with ID {$profile-id}.")
 function api:delete-profile($profile-id as xs:string) {
     if (profile:home($profile-id) != "")
     then 
