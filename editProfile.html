@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <head>
         <title>Edit Profiles</title>
@@ -115,15 +114,20 @@ token 2</param>
                 <xf:resource value="concat('http://localhost:8080/exist/restxq/xtoks/profile/',instance('vars')/current-profile-id/text())"/>
             </xf:submission>
             <xf:submission id="storeProfile" method="put" replace="instance" ref="instance('profile')">
-                <xf:resource value="concat('http://xToksAdmin:SvP5p5z3yCyL5DeM@localhost:8080/exist/restxq/xtoks/profile/',instance('profile')/@id)"/>
+                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtoks/profile/',instance('profile')/@id)"/>
                 <xf:action ev:event="xforms-submit-done">
                     <xf:send submission="listProfiles"/>
                 </xf:action>
             </xf:submission>
-            <xf:submission id="deleteProfile" method="delete" replace="instance" ref="instance('profile')">
-                <xf:resource value="concat('http://xToksAdmin:SvP5p5z3yCyL5DeM@localhost:8080/exist/restxq/xtoks/profile/',instance('profile')/@id)"/>
+            <xf:submission id="deleteProfile" method="delete" replace="none">
+                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtoks/profile/',instance('profile')/@id)"/>
+                <xf:message ev:event="xforms-submit-done" level="ephemeral">Deleted profile</xf:message>
+                <xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured (error type: <xf:output value="event('error-type')"/>; resource: <xf:output value="event('resource-uri')"/>; reason: <xf:output value="event('error-message')"/>)</xf:message>
+                <xf:action ev:event="xforms-submit-done">
+                    <xf:send submission="listProfiles"/>
+                </xf:action>
             </xf:submission>
-            <xf:submission id="createProfile" method="post" replace="instance" ref="instance('profile')" action="http://xToksAdmin:SvP5p5z3yCyL5DeM@localhost:8080/exist/restxq/xtoks/profile">
+            <xf:submission id="createProfile" method="post" replace="instance" ref="instance('profile')" action="http://localhost:8080/exist/restxq/xtoks/profile">
                 <!--<xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured (error type: <xf:output value="event('error-type')"/>; resource-Delete: <xf:output value="event('resource-Delete')"/>; reason: <xf:output value="event('response-reason-phrase')"/>)</xf:message>-->
                 <xf:action ev:event="xforms-submit-done">
                     <xf:setvalue ref="instance('vars')/current-profile-id" value="instance('profile')/@id"/>
@@ -152,7 +156,7 @@ token 2</param>
         <xf:group ref="instance('profile')[@id]">
             <xf:trigger>
                 <xf:label>Delete this profile</xf:label>
-                <xf:send submission="delete"/>
+                <xf:send submission="deleteProfile"/>
             </xf:trigger>
         </xf:group>
         <div>
