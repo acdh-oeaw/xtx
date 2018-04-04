@@ -59,10 +59,7 @@ declare function profile:prepare($id as xs:string) {
     let $make_xsl := if (doc-available($config:make_xsl)) then doc($config:make_xsl) else ()
     let $make_xsl_existdb as document-node() := 
         let $tr := transform:transform($make_xsl, doc($config:prep_make_xsl_existdb), ())
-        return 
-        if (doc-available($config:xsls||"/make_xsl_existdb.xsl"))
-        then doc($config:xsls||"/make_xsl_existdb.xsl")
-        else doc(xmldb:store($config:xsls, "make_xsl_existdb.xsl", $tr))
+        return doc(xmldb:store($config:xsls, "make_xsl_existdb.xsl", $tr))
     let $stylesheets := transform:transform($profile, $make_xsl_existdb, ())
     return 
         for $s in $stylesheets
