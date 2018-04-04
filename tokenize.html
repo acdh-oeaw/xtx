@@ -1,20 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
     <h4>Tokenizer Webform</h4>
     <form id="form" class="form-horizontal" method="POST" enctype="application/xml">
-        <div class="control-group"><label for="profile">Profile</label><select name="profile" id="profile">
-                <option data-template="app:profiles">List of profiles inserted here by templating function app:profile.</option></select>
+        <div class="control-group">
+            <label for="profile">Profile</label>
+            <select name="profile" id="profile">
+                <option data-template="app:profiles-to-option">List of profiles inserted here by templating function app:profile.</option>
+            </select>
         </div>
-        <div class="control-group"><label for="format">Format</label><select name="format" id="format">
+        <div class="control-group">
+            <label for="format">Format</label>
+            <select name="format" id="format">
                 <option value="rmNl">remove New lines</option>
                 <option value="doc">tokenize, return original</option>
                 <option value="txt">tokenize, return plain text vertical</option>
-                <option value="vert">tokenize, return xml vertical</option></select>
+                <option value="vert">tokenize, return xml vertical</option>
+            </select>
         </div>
-        <div class="control-group"><label for="data">XML file upload</label>
-<!--            <input type="file" name="data" id="data"/>--><textarea id="data">
-                <xml></xml></textarea>
-        </div><button type="submit">Run</button>
+        <div class="control-group">
+            <label for="data">XML file upload</label>
+<!--            <input type="file" name="data" id="data"/>-->
+            <textarea id="data">
+                <xml/>
+            </textarea>
+        </div>
+        <button type="submit">Run</button>
     </form>
     <script type="text/javascript">
         tokenize = {};
