@@ -1,4 +1,4 @@
 [submodule "xsl-tokenizer"]
 	path = xsl-tokenizer
-	url = https://dschopper@acdh.oeaw.ac.at/redmine/xsl-tokenizer.git
-	branch = v2
+	url = https://github.com/acdh-oeaw/xsl-tokenizer
+	branch = master
