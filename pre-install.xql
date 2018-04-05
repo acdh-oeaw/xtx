@@ -29,7 +29,7 @@ declare variable $profile-config := <collection xmlns="http://exist-db.org/colle
     </index>
     <triggers>
         <trigger class="org.exist.collections.triggers.XQueryTrigger">
-            <parameter name="url" value="xmldb:exist:///db/apps/xToks/modules/updateProfile.xql"/>
+            <parameter name="url" value="xmldb:exist:///{$target}/modules/updateProfile.xql"/>
         </trigger>
     </triggers>
 </collection>

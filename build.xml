@@ -6,6 +6,8 @@
     <property name="build.dir" value="build"/>
     <target name="xar">
         <mkdir dir="${build.dir}"/>
-        <zip basedir="." destfile="${build.dir}/${project.app}-${project.version}.xar" excludes="${build.dir}/*"/>
+        <zip destfile="${build.dir}/${project.app}-${project.version}.xar">
+            <fileset dir="." excludes="${build.dir}/**, export/**, xsl-tokenizer/test, xsl-tokenizer/*.*, xsl-tokenizer/test/**, xsl-tokenizer/LICENSE"/>
+        </zip>
     </target>
 </project>

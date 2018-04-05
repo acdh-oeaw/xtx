@@ -9,6 +9,6 @@
     <type>application</type>
     <target>xToks</target>
     <prepare>pre-install.xql</prepare>
-    <finish/>
+    <finish>post-install.xql</finish>
     <permissions user="xToksAdmin" password="" group="xToksAdmin" mode="rw-rw-r--"/>
 </meta>
