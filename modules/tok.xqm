@@ -13,7 +13,8 @@ declare function tok:rmNl ($doc as document-node(), $profile-id as xs:string?) a
 declare function tok:toks($doc as document-node(), $profile-id as xs:string) as item() {
     let $profile := profile:home($profile-id),
         $path-to-wrapper := $profile||"/wrapper_toks.xsl",
-        $xsl := if (doc-available($path-to-wrapper)) then doc($path-to-wrapper) else ()
+        $prepare-wrapper := if (doc-available($path-to-wrapper)) then () else profile:prepare($profile-id),
+        $xsl := doc($path-to-wrapper)
     return
         if ($xsl)
         then document { transform:transform($doc, $xsl, ()) }
@@ -23,11 +24,8 @@ declare function tok:toks($doc as document-node(), $profile-id as xs:string) as 
 declare function tok:addP($doc as document-node(), $profile-id as xs:string) as item() {
     let $profile := profile:home($profile-id),
         $path-to-wrapper := $profile||"/wrapper_addP.xsl",
-        $xsl := if (doc-available($path-to-wrapper)) then doc($path-to-wrapper) else ()
-    return
-        if ($xsl)
-        then document { transform:transform($doc, $xsl, ()) }
-        else ()
+        $xsl := if (doc-available($path-to-wrapper)) then doc($path-to-wrapper) else fn:error(QName("http://acdh.oeaw.ac.at/apps/xtoks/tokenize", "MISSING_WRAPPER_XSL"), "wrapper_addP.xsl missing for profile '"||$profile-id||"'")
+    return document { transform:transform($doc, $xsl, ()) } 
 };
 
 declare function tok:tei2vert($doc as document-node(), $profile-id as xs:string) as item() {
