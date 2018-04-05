@@ -1,6 +1,6 @@
 xquery version "3.0";
 
-import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "modules/config.xqm";
+import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "modules/config.xqm";
 
 let $target-base-default := "/Users/Daniel/repo"
 return 

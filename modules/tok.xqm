@@ -1,8 +1,8 @@
 xquery version "3.0";
 
-module namespace tok = "http://acdh.oeaw.ac.at/apps/xtoks/tokenize";
-import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
-import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtoks/profile" at "profile.xqm";
+module namespace tok = "http://acdh.oeaw.ac.at/apps/xtx/tokenize";
+import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
+import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtx/profile" at "profile.xqm";
 
 declare function tok:rmNl ($doc as document-node(), $profile-id as xs:string?) as document-node() {
     let $path-to-xsl := $config:tokenizer-home||"/xsl/rmNl.xsl",
@@ -24,7 +24,7 @@ declare function tok:toks($doc as document-node(), $profile-id as xs:string) as 
 declare function tok:addP($doc as document-node(), $profile-id as xs:string) as item() {
     let $profile := profile:home($profile-id),
         $path-to-wrapper := $profile||"/wrapper_addP.xsl",
-        $xsl := if (doc-available($path-to-wrapper)) then doc($path-to-wrapper) else fn:error(QName("http://acdh.oeaw.ac.at/apps/xtoks/tokenize", "MISSING_WRAPPER_XSL"), "wrapper_addP.xsl missing for profile '"||$profile-id||"'")
+        $xsl := if (doc-available($path-to-wrapper)) then doc($path-to-wrapper) else fn:error(QName("http://acdh.oeaw.ac.at/apps/xtx/tokenize", "MISSING_WRAPPER_XSL"), "wrapper_addP.xsl missing for profile '"||$profile-id||"'")
     return document { transform:transform($doc, $xsl, ()) } 
 };
 

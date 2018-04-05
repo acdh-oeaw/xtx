@@ -103,7 +103,7 @@ token 2</param>
                     <profile/>
                 </data>
             </xf:instance>
-            <xf:submission id="listProfiles" method="get" replace="instance" ref="instance('profiles')" action="http://localhost:8080/exist/restxq/xtoks/profile">
+            <xf:submission id="listProfiles" method="get" replace="instance" ref="instance('profiles')" action="http://localhost:8080/exist/restxq/xtx/profile">
                 <xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured (error type: <xf:output value="event('error-type')"/>; resource-Delete: <xf:output value="event('resource-Delete')"/>; reason: <xf:output value="event('response-reason-phrase')"/>)</xf:message>
                 <xf:message ev:event="xforms-submit-done" level="ephemeral">loaded profiles list</xf:message>
             </xf:submission>
@@ -111,23 +111,23 @@ token 2</param>
                 <xf:send submission="listProfiles"/>
             </xf:action>
             <xf:submission id="getProfile" method="get" replace="instance" ref="instance('profile')">
-                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtoks/profile/',instance('vars')/current-profile-id/text())"/>
+                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtx/profile/',instance('vars')/current-profile-id/text())"/>
             </xf:submission>
             <xf:submission id="storeProfile" method="put" replace="instance" ref="instance('profile')">
-                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtoks/profile/',instance('profile')/@id)"/>
+                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtx/profile/',instance('profile')/@id)"/>
                 <xf:action ev:event="xforms-submit-done">
                     <xf:send submission="listProfiles"/>
                 </xf:action>
             </xf:submission>
             <xf:submission id="deleteProfile" method="delete" replace="none">
-                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtoks/profile/',instance('profile')/@id)"/>
+                <xf:resource value="concat('http://localhost:8080/exist/restxq/xtx/profile/',instance('profile')/@id)"/>
                 <xf:message ev:event="xforms-submit-done" level="ephemeral">Deleted profile</xf:message>
                 <xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured (error type: <xf:output value="event('error-type')"/>; resource: <xf:output value="event('resource-uri')"/>; reason: <xf:output value="event('error-message')"/>)</xf:message>
                 <xf:action ev:event="xforms-submit-done">
                     <xf:send submission="listProfiles"/>
                 </xf:action>
             </xf:submission>
-            <xf:submission id="createProfile" method="post" replace="instance" ref="instance('profile')" action="http://localhost:8080/exist/restxq/xtoks/profile">
+            <xf:submission id="createProfile" method="post" replace="instance" ref="instance('profile')" action="http://localhost:8080/exist/restxq/xtx/profile">
                 <!--<xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured (error type: <xf:output value="event('error-type')"/>; resource-Delete: <xf:output value="event('resource-Delete')"/>; reason: <xf:output value="event('response-reason-phrase')"/>)</xf:message>-->
                 <xf:action ev:event="xforms-submit-done">
                     <xf:setvalue ref="instance('vars')/current-profile-id" value="instance('profile')/@id"/>
@@ -139,7 +139,7 @@ token 2</param>
         </xf:model>
     </head>
     <body>
-        <h1>XML Tokenizer | Manage Profiles</h1>
+        <h1>xtx | Manage Profiles</h1>
         <xf:select1 ref="instance('vars')/current-profile-id">
             <xf:label>Choose the profile to edit</xf:label>
             <xf:itemset nodeset="instance('profiles')/profile">

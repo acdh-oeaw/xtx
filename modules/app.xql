@@ -1,10 +1,10 @@
 xquery version "3.0";
 
-module namespace app="http://acdh.oeaw.ac.at/apps/xtoks/templates";
+module namespace app="http://acdh.oeaw.ac.at/apps/xtx/templates";
 
 import module namespace templates="http://exist-db.org/xquery/templates" ;
-import module namespace config="http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
-import module namespace profile="http://acdh.oeaw.ac.at/apps/xtoks/profile" at "profile.xqm";
+import module namespace config="http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
+import module namespace profile="http://acdh.oeaw.ac.at/apps/xtx/profile" at "profile.xqm";
 
 (:~
  : Populates a selectbox with the available profiles.

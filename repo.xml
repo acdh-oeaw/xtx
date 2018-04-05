@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta xmlns="http://exist-db.org/xquery/repo">
-    <description>a simple RESTful application for tokenizing structured XML documents</description>
+    <description>xtx is a simple, RESTful application for tokenizing structured XML documents in a fully configurable manner.</description>
     <author>Daniel Schopper</author>
     <website/>
     <status>beta</status>
-    <license>GNU-LGPL</license>
+    <license>MIT</license>
     <copyright>true</copyright>
     <type>application</type>
-    <target>xToks</target>
+    <target>xtx</target>
     <prepare>pre-install.xql</prepare>
     <finish>post-install.xql</finish>
-    <permissions user="xToksAdmin" password="" group="xToksAdmin" mode="rw-rw-r--"/>
+    <permissions user="xTxAdmin" password="" group="xTxAdmin" mode="rw-rw-r--"/>
 </meta>

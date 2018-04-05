@@ -1,19 +1,19 @@
 xquery version "3.0";
 
 
-module namespace api = "http://acdh.oeaw.ac.at/apps/xtoks/api";
+module namespace api = "http://acdh.oeaw.ac.at/apps/xtx/api";
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 
-import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
-import module namespace tok = "http://acdh.oeaw.ac.at/apps/xtoks/tokenize" at "tok.xqm";
-import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtoks/profile" at "profile.xqm";
+import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
+import module namespace tok = "http://acdh.oeaw.ac.at/apps/xtx/tokenize" at "tok.xqm";
+import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtx/profile" at "profile.xqm";
 
 
 (: Remove Newlines :)
 declare
     %rest:POST("{$data}")
-    %rest:path("/xtoks/rmNl")
+    %rest:path("/xtx/rmNl")
     %rest:consumes("application/xml")
     %rest:produces("application/xml")
     %tok:desc("Preparatory Step: Removes all insignificant newlines from the input document")
@@ -27,7 +27,7 @@ function api:rmNl($data as document-node()) {
 (: either return the tokenized document (format = doc) or a xml vertical (format = vert):)
 declare
     %rest:POST("{$data}")
-    %rest:path("/xtoks/tokenize/{$profile-id}")
+    %rest:path("/xtx/tokenize/{$profile-id}")
     %rest:query-param("format", "{$format}", "doc")
     %rest:consumes("application/xml")
     %rest:produces("application/xml")
@@ -43,7 +43,7 @@ function api:tokenize-xml($data as document-node(), $profile-id as xs:string, $f
 (: make a plain text vertical of document :)
 declare
     %rest:POST("{$data}")
-    %rest:path("/xtoks/tokenize/{$profile-id}")
+    %rest:path("/xtx/tokenize/{$profile-id}")
     %rest:consumes("application/xml")
     %rest:produces("text/plain")
     %output:method("text")
@@ -58,7 +58,7 @@ function api:tokenize-txt($data as document-node(), $profile-id as xs:string) {
 (: Make vertical of document with tokens :)
 declare
     %rest:POST("{$data}")
-    %rest:path("/xtoks/verticalize/{$profile-id}")
+    %rest:path("/xtx/verticalize/{$profile-id}")
     %rest:consumes("application/xml")
     %rest:produces("text/plain")
     %output:method("text")
@@ -75,7 +75,7 @@ function api:verticalize($data as document-node(), $profile-id as xs:string) {
 (: Profile Management :)
 declare 
     %rest:GET 
-    %rest:path("/xtoks/profile")
+    %rest:path("/xtx/profile")
     %rest:produces("application/xml")
     %output:method("xml")
     %output:indent("yes")
@@ -89,7 +89,7 @@ function api:list-profiles() {
 
 declare 
     %rest:GET 
-    %rest:path("/xtoks/profile/{$profile-id}")
+    %rest:path("/xtx/profile/{$profile-id}")
     %rest:produces("application/xml")
     %tok:desc("Get tokenization profile with ID {$profile-id}.")
 function api:read-profile($profile-id as xs:string){
@@ -98,7 +98,7 @@ function api:read-profile($profile-id as xs:string){
 
 declare 
     %rest:POST("{$data}") 
-    %rest:path("/xtoks/profile")
+    %rest:path("/xtx/profile")
     %rest:produces("application/xml")
     %rest:consumes("application/xml")
     %tok:desc("Create a new tokenization profile.")
@@ -109,7 +109,7 @@ function api:create-profile($data as document-node()) {
 
 declare 
     %rest:PUT("{$data}") 
-    %rest:path("/xtoks/profile/{$profile-id}")
+    %rest:path("/xtx/profile/{$profile-id}")
     %rest:produces("application/xml")
     %rest:consumes("application/xml")
     %tok:desc("Update tokenization profile with ID {$profile-id}.")
@@ -123,7 +123,7 @@ function api:update-profile($data as document-node(), $profile-id as xs:string) 
 
 declare 
     %rest:DELETE 
-    %rest:path("/xtoks/profile/{$profile-id}")
+    %rest:path("/xtx/profile/{$profile-id}")
     %rest:produces("application/xml")
     %tok:desc("Delete tokenization profile with ID {$profile-id}.")
 function api:delete-profile($profile-id as xs:string) {

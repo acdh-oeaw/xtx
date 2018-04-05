@@ -1,11 +1,11 @@
 xquery version "3.0";
 
-module namespace profile = "http://acdh.oeaw.ac.at/apps/xtoks/profile";
+module namespace profile = "http://acdh.oeaw.ac.at/apps/xtx/profile";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace xsl="http://www.w3.org/1999/XSL/Transform";
 
-import module namespace config = "http://acdh.oeaw.ac.at/apps/xtoks/config" at "config.xqm";
+import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
 
 declare function profile:home($id as xs:string) {
     let $profile := profile:read($id)
