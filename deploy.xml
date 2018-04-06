@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." name="deploy-xtx" xmlns:xdb="http://exist-db.org/ant" default="deploy">
-  <description>Builds, uploads and deploys the xtoks application and subsequently runs the tests.</description>
+  <description>Targets for uploading, deploying and undeploying the xtx application.</description>
     <import file="build.xml"/>
     <!-- the path to existdb source files -->
     <property name="p.exist.dir" value="C:\exist-db4"/>
@@ -29,31 +29,11 @@
     </target>
     
     <target name="deploy" depends="upload" description="deploys the uploaded xar package">
-        <property name="path-to-xar" value="${build.filename}"/>
-        <xdb:xquery xmlns:xdb="http://exist-db.org/ant" uri="${p.exist.url}" user="${p.user}" password="${p.pass}">
-            <variable name="path-to-xar" value="${path-to-xar}"/>
-            xquery version "3.0";
-            
-            import module namespace repo = "http://exist-db.org/xquery/repo";
-            
-            declare variable $path-to-xar external;
-            
-            repo:install-and-deploy-from-db($path-to-xar)
-        </xdb:xquery>
+        <xdb:xquery uri="${p.exist.url}" user="${p.user}" password="${p.pass}">repo:install-and-deploy-from-db('${build.filename}')</xdb:xquery>
+        <xdb:remove uri="${p.exist.url}" resource="${build.filename}" user="${p.user}" password="${p.pass}"/>
     </target>
     
     <target name="undeploy-and-remove" description="undeploys and removes the uploaded xar package">
-        <property name="app-name" value="${project.app-name}"/>
-        <xdb:xquery xmlns:xdb="http://exist-db.org/ant" uri="${p.exist.url}" user="${p.user}" password="${p.pass}">
-            <variable name="app-name" value="${app-name}"/>
-            xquery version "3.0";
-            
-            import module namespace repo = "http://exist-db.org/xquery/repo";
-            
-            declare variable $app-name external;
-            
-            repo:undeploy($app-name),
-            repo:remove($app-name)
-        </xdb:xquery>
+        <xdb:xquery uri="${p.exist.url}" user="${p.user}" password="${p.pass}">repo:undeploy('${project.app-name}'),repo:remove('${project.app-name}')</xdb:xquery>
     </target>
 </project>
