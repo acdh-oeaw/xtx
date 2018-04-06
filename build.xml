@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="xar" name="xtoks">
-    <xmlproperty file="expath-pkg.xml"/>
+<project default="xar" name="xtoks" basedir=".">
+    <import file="deploy.xml"/>
+    <dirname property="xtoks.basedir" file="${ant.file.xtoks}"/>
+    <xmlproperty file="${xtoks.basedir}/expath-pkg.xml"/>
     <property name="project.version" value="${package(version)}"/>
-    <property name="project.app" value="xtx"/>
-    <property name="build.dir" value="build"/>
+    <property name="project.app" value="${package(abbrev)}"/>
+    <property name="project.app-name" value="${package(name)}"/>
+    <property name="xtoks.build.dir" value="${xtoks.basedir}/build"/>
+    <property name="build.filename" value="${project.app}-${project.version}.xar"/>
+    <property name="xtoks.build.filepath" value="${xtoks.build.dir}/${build.filename}"/>
     <target name="xar">
-        <mkdir dir="${build.dir}"/>
-        <zip destfile="${build.dir}/${project.app}-${project.version}.xar">
-            <fileset dir="." excludes="${build.dir}/**, export/**, xsl-tokenizer/test, xsl-tokenizer/*.*, xsl-tokenizer/test/**, xsl-tokenizer/LICENSE"/>
+        <mkdir dir="${xtoks.build.dir}"/>
+        <zip destfile="${xtoks.build.filepath}">
+            <fileset dir="${xtoks.basedir}" excludes="build/**, export/**, xsl-tokenizer/test, xsl-tokenizer/*.*, xsl-tokenizer/test/**, xsl-tokenizer/LICENSE"/>
         </zip>
     </target>
 </project>

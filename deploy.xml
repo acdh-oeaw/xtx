@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." name="deploy-xtx" xmlns:xdb="http://exist-db.org/ant" default="deploy">
+  <description>Builds, uploads and deploys the xtoks application and subsequently runs the tests.</description>
+    <import file="build.xml"/>
+    <!-- the path to existdb source files -->
+    <property name="p.exist.dir" value="C:\exist-db4"/>
+    <!-- the path to the exist instance to be used for testing -->
+    <property name="p.exist.url" value="xmldb:exist://localhost:8080/exist/xmlrpc/db/"/>
+    <property name="p.user" value="admin"/>
+    <property name="p.pass" value="admin"/>
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+        <classpath>
+            <fileset dir="${p.exist.dir}/lib/core">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${p.exist.dir}/lib/endorsed">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${p.exist.dir}/lib/optional">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${p.exist.dir}/exist.jar"/>
+            <pathelement location="${p.exist.dir}/exist-optional.jar"/>
+        </classpath>
+    </typedef>
+    
+    <target name="upload" depends="xar" description="uploads the last xar package into a existdb collection">
+        <xdb:store uri="${p.exist.url}" user="${p.user}" password="${p.pass}" createcollection="true" createsubcollections="true" srcfile="${xtoks.build.filepath}"/>
+    </target>
+    
+    <target name="deploy" depends="upload" description="deploys the uploaded xar package">
+        <property name="path-to-xar" value="${build.filename}"/>
+        <xdb:xquery xmlns:xdb="http://exist-db.org/ant" uri="${p.exist.url}" user="${p.user}" password="${p.pass}">
+            <variable name="path-to-xar" value="${path-to-xar}"/>
+            xquery version "3.0";
+            
+            import module namespace repo = "http://exist-db.org/xquery/repo";
+            
+            declare variable $path-to-xar external;
+            
+            repo:install-and-deploy-from-db($path-to-xar)
+        </xdb:xquery>
+    </target>
+    
+    <target name="undeploy-and-remove" description="undeploys and removes the uploaded xar package">
+        <property name="app-name" value="${project.app-name}"/>
+        <xdb:xquery xmlns:xdb="http://exist-db.org/ant" uri="${p.exist.url}" user="${p.user}" password="${p.pass}">
+            <variable name="app-name" value="${app-name}"/>
+            xquery version "3.0";
+            
+            import module namespace repo = "http://exist-db.org/xquery/repo";
+            
+            declare variable $app-name external;
+            
+            repo:undeploy($app-name),
+            repo:remove($app-name)
+        </xdb:xquery>
+    </target>
+</project>
