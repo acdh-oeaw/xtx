@@ -63,7 +63,11 @@ declare function profile:prepare($id as xs:string) {
     let $stylesheets := transform:transform($profile, $make_xsl_existdb, ())
     return 
         for $s in $stylesheets
-        return xmldb:store(profile:home($id), $s/@xml:id||".xsl", $s)
+        let $filename :=  $s/@xml:id||".xsl"
+        return (
+            xmldb:store($profile-home, $filename, $s),
+            sm:chown(xs:anyURI($profile-home||"/"||$filename), $config:admin-user)
+        )
 };
 
 (: getter function for specific profile settings :)

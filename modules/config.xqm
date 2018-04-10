@@ -40,7 +40,7 @@ declare variable $config:xsls := $config:tokenizer-home||"/xsl";
 declare variable $config:prep_make_xsl_existdb := $config:xsls || "/prep_make_xsl_existdb.xsl";
 declare variable $config:make_xsl := $config:xsls|| "/make_xsl.xsl"; 
 
- 
+declare variable $config:admin-user := doc($config:app-root||"/repo.xml")//repo:permissions/@user/data(.); 
 
 declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.xml"))/repo:meta;
 
