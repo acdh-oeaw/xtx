@@ -20,8 +20,10 @@ declare function profile:create($profile as document-node()) as xs:string {
     return
         if ($id)
         then 
-            let $col := xmldb:create-collection($config:profiles, $id), 
-                $store := xmldb:store($config:profiles||"/"||$id, "profile.xml", $profile),
+            let $log := config:log(0, "Attempting to create collection "||$config:profiles||"/"||$id)
+            let $col := xmldb:create-collection($config:profiles, $id) 
+            let $store := xmldb:store($config:profiles||"/"||$id, "profile.xml", $profile)
+            let $log := config:log(0, "Stored profile in "||$config:profiles||"/profile.xml"),
                 $set-id := update value doc($config:profiles||"/"||$id||"/profile.xml")/profile/@id with $id,
                 $set-created := update value doc($config:profiles||"/"||$id||"/profile.xml")/profile/@created with current-dateTime()
             return $id
@@ -60,7 +62,7 @@ declare function profile:prepare($id as xs:string) {
     let $make_xsl_existdb as document-node() := 
         let $tr := transform:transform($make_xsl, doc($config:prep_make_xsl_existdb), ())
         return doc(xmldb:store($config:xsls, "make_xsl_existdb.xsl", $tr))
-    let $stylesheets := transform:transform($profile, $make_xsl_existdb, ())
+    let $stylesheets := transform:transform($profile, $make_xsl_existdb, ()) 
     return 
         for $s in $stylesheets
         let $filename :=  $s/@xml:id||".xsl"

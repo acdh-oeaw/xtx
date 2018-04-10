@@ -103,6 +103,7 @@ declare
     %rest:consumes("application/xml")
     %tok:desc("Create a new tokenization profile.")
 function api:create-profile($data as document-node()) {
+    let $log := config:log(("Creating new profile: ", $data))
     let $id := profile:create($data)
     return profile:read($id)
 };

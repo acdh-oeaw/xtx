@@ -11,6 +11,8 @@ declare namespace templates="http://exist-db.org/xquery/templates";
 declare namespace repo="http://exist-db.org/xquery/repo";
 declare namespace expath="http://expath.org/ns/pkg";
 
+import module namespace console = "http://exist-db.org/xquery/console";
+
 (: 
     Determine the application root collection from the current module load path.
 :)
@@ -45,6 +47,20 @@ declare variable $config:admin-user := doc($config:app-root||"/repo.xml")//repo:
 declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.xml"))/repo:meta;
 
 declare variable $config:expath-descriptor := doc(concat($config:app-root, "/expath-pkg.xml"))/expath:package;
+
+declare variable $config:app-name := $config:expath-descriptor/@name/data(.);
+
+declare variable $config:log-level := 0; 
+
+declare function config:log($message as item()*) {
+    console:log($config:app-name, $message)
+};
+
+declare function config:log($level as xs:integer, $message as item()*) {
+    if ($level ge $config:log-level)
+    then console:log($config:app-name, $message)
+    else ()
+};
 
 (:~
  : Resolve the given path using the current application context.
