@@ -13,6 +13,6 @@ declare variable $dir external;
 declare variable $target external;
 
 (: setui on rest endpoints :)
-(sm:chmod(xs:anyURI($target||"/modules/rest.xqm"), "rwSrwxr-x"),
+(sm:chmod(xs:anyURI($target||"/modules/rest.xqm"), "rwsrwxr-x"),
 (: setui on updateProfile.xql :)
-sm:chmod(xs:anyURI($target||"/modules/updateProfile.xql"), "rwSrwxr-x"))
+sm:chmod(xs:anyURI($target||"/modules/updateProfile.xql"), "rwsrwxr-x"))
