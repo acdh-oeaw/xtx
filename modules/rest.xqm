@@ -4,6 +4,7 @@ xquery version "3.0";
 module namespace api = "http://acdh.oeaw.ac.at/apps/xtx/api";
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare namespace json="http://www.json.org";
 
 import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
 import module namespace tok = "http://acdh.oeaw.ac.at/apps/xtx/tokenize" at "tok.xqm";
@@ -53,7 +54,7 @@ function api:tokenize-txt($data as document-node(), $profile-id as xs:string) {
     then tok:tokenize($data, $profile-id, "txt")
     else <error>unknown profile {$profile-id}</error>
 };
- 
+
 
 (: Make vertical of document with tokens :)
 declare
@@ -82,6 +83,20 @@ declare
     %tok:desc("List available tokenization profiles.")
 function api:list-profiles() {
     <profiles>{
+            for $p in collection($config:profiles)//profile 
+            return <profile id="{$p/@id}" created="{$p/@created}" last-updated="{$p/@last-updated}">{$p/about}</profile>
+    }</profiles>
+};
+
+declare 
+    %rest:GET 
+    %rest:path("/xtx/profile")
+    %rest:produces("application/json")
+    %output:method("json")
+    %output:indent("yes")
+    %tok:desc("List available tokenization profiles.")
+function api:list-profiles-json() {
+    <profiles json:object="true">{
             for $p in collection($config:profiles)//profile 
             return <profile id="{$p/@id}" created="{$p/@created}" last-updated="{$p/@last-updated}">{$p/about}</profile>
     }</profiles>
