@@ -1,6 +1,7 @@
 xquery version "3.0";
 
 module namespace tok = "http://acdh.oeaw.ac.at/apps/xtx/tokenize";
+declare namespace xsl = "http://www.w3.org/1999/XSL/Transform";
 import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
 import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtx/profile" at "profile.xqm";
 import module namespace console = "http://exist-db.org/xquery/console";
@@ -64,17 +65,27 @@ declare function tok:vert2txt($doc as document-node(), $profile-id as xs:string)
         else ()
 };
 
+declare function tok:postprocess($pAdded as document-node(), $profile-id as xs:string){
+    let $profile := profile:read($profile-id),
+        $postprocess-xsl := $profile//postProcessing/xsl:stylesheet
+    return 
+        if (exists($postprocess-xsl)) 
+        then transform:transform($pAdded, $postprocess-xsl, ())
+        else $pAdded
+};
+
 
 declare function tok:tokenize($doc as document-node(), $profile-id as xs:string, $format as xs:string) as item()* {
     let $nlRmd := tok:rmNl($doc, $profile-id),
         $toks := tok:toks($nlRmd, $profile-id),
-        $pAdded := tok:addP($toks, $profile-id)
+        $pAdded := tok:addP($toks, $profile-id),
+        $postProcessed := tok:postprocess($pAdded, $profile-id)
     return 
         switch($format)
-            case "vert" return tok:tei2vert($pAdded, $profile-id)
+            case "vert" return tok:tei2vert($postProcessed, $profile-id)
             case "txt" return 
-                let $vert := tok:tei2vert($pAdded, $profile-id)
+                let $vert := tok:tei2vert($postProcessed, $profile-id)
                 return tok:vert2txt($vert, $profile-id)
-            case "doc" return $pAdded
-            default return $pAdded
+            case "doc" return $postProcessed
+            default return $postProcessed
 };
