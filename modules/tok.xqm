@@ -3,11 +3,17 @@ xquery version "3.0";
 module namespace tok = "http://acdh.oeaw.ac.at/apps/xtx/tokenize";
 import module namespace config = "http://acdh.oeaw.ac.at/apps/xtx/config" at "config.xqm";
 import module namespace profile = "http://acdh.oeaw.ac.at/apps/xtx/profile" at "profile.xqm";
+import module namespace console = "http://exist-db.org/xquery/console";
 
 declare function tok:rmNl ($doc as document-node(), $profile-id as xs:string?) as document-node() {
     let $path-to-xsl := $config:tokenizer-home||"/xsl/rmNl.xsl",
         $xsl := doc($path-to-xsl)
-    return document { transform:transform($doc, $xsl, ()) }
+    return 
+        try  { 
+                document { transform:transform($doc, $xsl, ()) }
+            } catch * {
+                console:log( $err:code||" "||$err:description||" "||$err:value)
+            }
 };
 
 declare function tok:toks($doc as document-node(), $profile-id as xs:string) as item() {
@@ -17,7 +23,12 @@ declare function tok:toks($doc as document-node(), $profile-id as xs:string) as 
         $xsl := doc($path-to-wrapper)
     return
         if ($xsl)
-        then document { transform:transform($doc, $xsl, ()) }
+        then 
+            try  { 
+                document { transform:transform($doc, $xsl, ()) }
+            } catch * {
+                console:log( $err:code||" "||$err:description||" "||$err:value)
+            }
         else ()
 };
 
@@ -34,7 +45,12 @@ declare function tok:tei2vert($doc as document-node(), $profile-id as xs:string)
         $xsl := if (doc-available($path-to-wrapper)) then doc($path-to-wrapper) else ()
     return
         if ($xsl)
-        then document { transform:transform($doc, $xsl, ()) }
+        then 
+            try  { 
+                document { transform:transform($doc, $xsl, ()) }
+            } catch * {
+                console:log( $err:code||" "||$err:description||" "||$err:value)
+            }
         else ()
 };
   

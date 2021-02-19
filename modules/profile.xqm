@@ -21,7 +21,14 @@ declare function profile:create($profile as document-node()) as xs:string {
         if ($id)
         then 
             let $log := config:log(0, "Attempting to create collection "||$config:profiles||"/"||$id)
-            let $col := xmldb:create-collection($config:profiles, $id) 
+            let $col := 
+                try { 
+                    xmldb:create-collection($config:profiles, $id), 
+                    config:log(0, "Created collection "||$config:profiles||"/"||$id)
+                }
+                catch * {
+                    config:log(0, "Caught error "||$err:code||": "||$err:description||". Data: "||$err:value)
+                }
             let $store := xmldb:store($config:profiles||"/"||$id, "profile.xml", $profile)
             let $log := config:log(0, "Stored profile in "||$config:profiles||"/profile.xml"),
                 $set-id := update value doc($config:profiles||"/"||$id||"/profile.xml")/profile/@id with $id,
@@ -31,7 +38,11 @@ declare function profile:create($profile as document-node()) as xs:string {
 };
 
 declare function profile:read($id as xs:string) as element(profile) {
-    collection($config:profiles)//profile[@id = $id]
+    let $profile := collection($config:profiles)//profile[@id = $id]
+    return 
+        if (exists($profile))
+        then $profile
+        else error(xs:QName('profile:unknownProfile'), 'Unknown profile '||$id)
 };
 
 declare function profile:update($id as xs:string, $data as document-node()) {
